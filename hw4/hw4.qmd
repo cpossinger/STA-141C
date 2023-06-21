@@ -1,0 +1,101 @@
+---
+title: "STA 141C Homework 4"
+subtitle: "Camden Possinger"
+format:
+  html:
+    code-fold: true
+---
+
+
+# 1. Handwriting Recognition
+
+## Question 1. 
+
+Open ‘trainingMLE.R’ and obtain MLE estimators for each of the 10 handwriting digits
+(0, 1, 2, . . . , 9). (You may need to change the path when loading the data)
+
+
+```{r}
+
+#| warning: false
+
+source("trainingMLE.R")
+logldirmn
+
+```
+
+
+## Question 2.
+
+Read in the testing data. Use the estimated MLE for each digit from training data to predict
+handwriting digits for the testing data.
+
+```{r}
+
+testdata <- read.table("handwriting/optdigits.tes", sep = ",")
+testdata <- as.matrix(testdata)
+
+
+testDigitProb  <- matrix(0, dim(testdata)[1], 10)
+for (dig in 0:9) {
+  testDigitProb[, dig + 1]  <- ddirmult(testdata[, -65], alphahat[dig + 1, ], log = TRUE)
+}
+testDigitProb  <- testDigitProb + 
+  rep(log(digitCount / sum(digitCount)), each = nrow(testdata))
+digitPredicted  <- max.col(testDigitProb) - 1
+
+table(testdata[,65],digitPredicted)
+
+```
+
+
+## Question 3.
+
+Comment on using gradient descent to obtain the MLE (instead of Newton’s method)? (You
+do not need to implement this.)
+
+In this case the objective function that we are optimizing is the 
+likelihood function for the Dirichlet-multinomial model. The main difference between 
+the two optimization methods is that Newton's method relies on both the first and second derivative 
+while gradient descent only relies on the first derivative and a prespecified learning rate
+to control the step size. Due to the complexity of the likelihood function we're working with 
+it makes sense to use gradient descent to obtain the MLE for each handwritten digit.
+
+
+
+## Question 4.
+
+What is the advantage and disadvantage of using gradient descent instead of Newton’s method?
+
+The advantage of using gradient descent is that you don't have to calculate the second 
+derivative of the function you're optimizing. Gradient descent can help 
+optimize likelihood functions that otherwise would be impossible or 
+inconvenient to calculate the second derivative for. 
+
+
+The disadvantage of gradient descent is that it tends to converge slower than 
+Newton's method because the step size might not be either too small or too large. 
+This slower convergence has negative implications on computation time and the resources 
+required to find a global minimum.
+
+
+## Question 5.
+
+Do you think the current method is satisfactory for predicting handwriting digits? Do you
+know any other method(s) that can achieve a higher accuracy?
+
+The current classifier does a pretty good job of classifying digits but it still 
+falls short of modern computer vision models. Currently the best type of model 
+for computer vision is a convolutional neural network due to its convolutional 
+filters that can extract spatial patterns in images.
+
+
+
+
+
+
+
+
+
+
+
